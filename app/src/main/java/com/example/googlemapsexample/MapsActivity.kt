@@ -6,7 +6,9 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import androidx.core.app.ActivityCompat
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import com.example.googlemapsexample.data.Place
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 
@@ -17,6 +19,10 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 
+/**
+ * Based on the Google Maps Platform documentation and examples:
+ * https://developers.google.com/maps/documentation/android-sdk/overview
+ */
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     companion object {
@@ -50,6 +56,14 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
+
+        viewModel.currentLocation.observe(this, {
+            goToCurrentLocation(it)
+        })
+
+        viewModel.nearbyPlaces.observe(this) {
+            renderNearbyHospitals(it)
+        }
     }
 
     private fun getLocationPermission() {
@@ -104,18 +118,21 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                         Log.i(TAG, "Current location ${task.result}")
                         if (lastKnownLocation != null) {
                             val currLocation = LatLng(
-                                    lastKnownLocation!!.latitude,
-                                    lastKnownLocation!!.longitude
+                                lastKnownLocation!!.latitude,
+                                lastKnownLocation!!.longitude
                             )
-                            map?.addMarker(MarkerOptions().position(currLocation).title("You are here"))
-                            map?.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                                    currLocation,
-                                    DEFAULT_ZOOM.toFloat()
-                            ))
+                            viewModel.updateCurrentLocation(currLocation)
+                            //val currLocation = viewModel.currentLocation.value!!
+//                            map?.addMarker(MarkerOptions().position(currLocation).title("You are here"))
+//                            map?.moveCamera(CameraUpdateFactory.newLatLngZoom(
+//                                    currLocation,
+//                                    DEFAULT_ZOOM.toFloat()
+//                            ))
                         }
                     } else {
                         Log.d(TAG, "Current location is null. Using defaults.")
                         Log.e(TAG, "Exception: %s", task.exception)
+                        viewModel.updateCurrentLocation(defaultLocation)
                         map?.moveCamera(CameraUpdateFactory
                             .newLatLngZoom(defaultLocation, DEFAULT_ZOOM.toFloat()))
                         //map?.uiSettings?.isMyLocationButtonEnabled = false
@@ -124,6 +141,28 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             }
         } catch (e: SecurityException) {
             Log.e("Exception: %s", e.message, e)
+        }
+    }
+
+    private fun goToCurrentLocation (location: LatLng) {
+        map?.addMarker(MarkerOptions().position(location).title("You are here"))
+        map?.moveCamera(CameraUpdateFactory.newLatLngZoom(
+            location,
+            DEFAULT_ZOOM.toFloat()
+        ))
+    }
+
+    private fun renderNearbyHospitals (nearby: List<Place>) {
+        nearby.forEach { place ->
+            val lat = place.geometry.location.lat
+            val lng = place.geometry.location.lng
+            val pos = LatLng(lat, lng)
+            Log.i(TAG, "Place: (${pos.latitude}, ${pos.longitude})")
+            map?.addMarker(MarkerOptions().position(pos).title(place.name))
+//                map?.moveCamera(CameraUpdateFactory.newLatLngZoom(
+//                    pos,
+//                    DEFAULT_ZOOM.toFloat()
+//                ))
         }
     }
 

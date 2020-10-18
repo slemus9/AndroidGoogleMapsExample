@@ -24,7 +24,7 @@ private val retrofit = Retrofit.Builder()
     .build()
 
 interface LocationApiService  {
-    @GET("json?types=pharmacy&key=${KEY}")
+    @GET("json?types=hospital&key=${KEY}")
     fun getNearbyPharmacies (
         @Query("location") location: String,
         @Query("radius") radius: Int,
