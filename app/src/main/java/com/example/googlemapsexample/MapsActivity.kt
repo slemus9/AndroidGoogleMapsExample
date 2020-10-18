@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import androidx.core.app.ActivityCompat
+import androidx.lifecycle.ViewModelProvider
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 
@@ -33,6 +34,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private var lastKnownLocation: Location? = null
 
     private val defaultLocation = LatLng(-33.8523341, 151.2106085)
+
+    private val viewModel: MapsViewModel by lazy {
+        ViewModelProvider(this).get(MapsViewModel::class.java)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
