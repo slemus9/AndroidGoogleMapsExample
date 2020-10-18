@@ -37,13 +37,14 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_maps)
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        val mapFragment = supportFragmentManager
-                .findFragmentById(R.id.map) as SupportMapFragment
-        mapFragment.getMapAsync(this)
 
         client = LocationServices.getFusedLocationProviderClient(this)
         getLocationPermission()
+
+        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+        val mapFragment = supportFragmentManager
+            .findFragmentById(R.id.map) as SupportMapFragment
+        mapFragment.getMapAsync(this)
     }
 
     private fun getLocationPermission() {
@@ -64,24 +65,24 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-//    private fun updateLocationUI() {
-//        if (map == null) {
-//            return
-//        }
-//        try {
-//            if (permissionGranted) {
-//                map?.isMyLocationEnabled = true
-//                map?.uiSettings?.isMyLocationButtonEnabled = true
-//            } else {
-//                map?.isMyLocationEnabled = false
-//                map?.uiSettings?.isMyLocationButtonEnabled = false
-//                lastKnownLocation = null
-//                getLocationPermission()
-//            }
-//        } catch (e: SecurityException) {
-//            Log.e("Exception: %s", e.message, e)
-//        }
-//    }
+    private fun updateLocationUI() {
+        if (map == null) {
+            return
+        }
+        try {
+            if (permissionGranted) {
+                map?.isMyLocationEnabled = true
+                map?.uiSettings?.isMyLocationButtonEnabled = true
+            } else {
+                map?.isMyLocationEnabled = false
+                map?.uiSettings?.isMyLocationButtonEnabled = false
+                lastKnownLocation = null
+                getLocationPermission()
+            }
+        } catch (e: SecurityException) {
+            Log.e("Exception: %s", e.message, e)
+        }
+    }
 
     private fun getDeviceLocation() {
         /*
@@ -95,6 +96,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                     if (task.isSuccessful) {
                         // Set the map's camera position to the current location of the device.
                         lastKnownLocation = task.result
+                        Log.i(TAG, "Current location ${task.result}")
                         if (lastKnownLocation != null) {
                             val currLocation = LatLng(
                                     lastKnownLocation!!.latitude,
@@ -111,7 +113,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                         Log.e(TAG, "Exception: %s", task.exception)
                         map?.moveCamera(CameraUpdateFactory
                             .newLatLngZoom(defaultLocation, DEFAULT_ZOOM.toFloat()))
-                        map?.uiSettings?.isMyLocationButtonEnabled = false
+                        //map?.uiSettings?.isMyLocationButtonEnabled = false
                     }
                 }
             }
@@ -133,6 +135,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         map = googleMap
 
         getLocationPermission()
+        updateLocationUI()
         getDeviceLocation()
 
         //val currentLocation = LatLng(lastKnownLocation!!.latitude, lastKnownLocation!!.longitude)
@@ -156,6 +159,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 }
             }
         }
-//        updateLocationUI()
+        updateLocationUI()
     }
+
 }

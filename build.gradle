@@ -4,6 +4,8 @@ buildscript {
         kotlin_version = "1.4.10"
         version_play_maps = "17.0.0"
         version_play_location = "17.1.0"
+        version_moshi = "1.9.3"
+        version_retrofit = "2.9.0"
     }
     repositories {
         google()

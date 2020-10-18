@@ -22,6 +22,7 @@ android {
             file("../secure.properties")?.withInputStream { secureProps.load(it) }
         }
         resValue "string", "maps_api_key", (secureProps.getProperty("MAPS_API_KEY") ?: "")
+        buildConfigField "String", "MAPS_API_KEY", '"' + (secureProps.getProperty("MAPS_API_KEY") ?: "") + '"'
     }
 
     buildTypes {
@@ -53,4 +54,12 @@ dependencies {
     // maps
     implementation "com.google.android.gms:play-services-location:$version_play_location"
     implementation "com.google.android.gms:play-services-maps:$version_play_maps"
+
+    // Moshi
+    implementation "com.squareup.moshi:moshi:$version_moshi"
+    implementation "com.squareup.moshi:moshi-kotlin:$version_moshi"
+
+    // Retrofit
+    implementation "com.squareup.retrofit2:retrofit: $version_retrofit"
+    implementation "com.squareup.retrofit2:converter-moshi:$version_retrofit"
 }
