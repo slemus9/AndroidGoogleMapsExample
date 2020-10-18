@@ -43,6 +43,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         mapFragment.getMapAsync(this)
 
         client = LocationServices.getFusedLocationProviderClient(this)
+        getLocationPermission()
     }
 
     private fun getLocationPermission() {
@@ -63,24 +64,24 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-    private fun updateLocationUI() {
-        if (map == null) {
-            return
-        }
-        try {
-            if (permissionGranted) {
-                map?.isMyLocationEnabled = true
-                map?.uiSettings?.isMyLocationButtonEnabled = true
-            } else {
-                map?.isMyLocationEnabled = false
-                map?.uiSettings?.isMyLocationButtonEnabled = false
-                lastKnownLocation = null
-                getLocationPermission()
-            }
-        } catch (e: SecurityException) {
-            Log.e("Exception: %s", e.message, e)
-        }
-    }
+//    private fun updateLocationUI() {
+//        if (map == null) {
+//            return
+//        }
+//        try {
+//            if (permissionGranted) {
+//                map?.isMyLocationEnabled = true
+//                map?.uiSettings?.isMyLocationButtonEnabled = true
+//            } else {
+//                map?.isMyLocationEnabled = false
+//                map?.uiSettings?.isMyLocationButtonEnabled = false
+//                lastKnownLocation = null
+//                getLocationPermission()
+//            }
+//        } catch (e: SecurityException) {
+//            Log.e("Exception: %s", e.message, e)
+//        }
+//    }
 
     private fun getDeviceLocation() {
         /*
@@ -95,9 +96,15 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                         // Set the map's camera position to the current location of the device.
                         lastKnownLocation = task.result
                         if (lastKnownLocation != null) {
+                            val currLocation = LatLng(
+                                    lastKnownLocation!!.latitude,
+                                    lastKnownLocation!!.longitude
+                            )
+                            map?.addMarker(MarkerOptions().position(currLocation).title("You are here"))
                             map?.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                                LatLng(lastKnownLocation!!.latitude,
-                                    lastKnownLocation!!.longitude), DEFAULT_ZOOM.toFloat()))
+                                    currLocation,
+                                    DEFAULT_ZOOM.toFloat()
+                            ))
                         }
                     } else {
                         Log.d(TAG, "Current location is null. Using defaults.")
@@ -129,10 +136,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         getDeviceLocation()
 
         //val currentLocation = LatLng(lastKnownLocation!!.latitude, lastKnownLocation!!.longitude)
-        val currentLocation = defaultLocation
-        // Add a marker in Sydney and move the camera
-        map?.addMarker(MarkerOptions().position(currentLocation).title("Current Location"))
-        map?.moveCamera(CameraUpdateFactory.newLatLng(currentLocation))
+//        val currentLocation = defaultLocation
+//        // Add a marker in Sydney and move the camera
+//        map?.addMarker(MarkerOptions().position(currentLocation).title("Current Location"))
+//        map?.moveCamera(CameraUpdateFactory.newLatLng(currentLocation))
     }
 
     override fun onRequestPermissionsResult(requestCode: Int,
@@ -149,6 +156,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 }
             }
         }
-        updateLocationUI()
+//        updateLocationUI()
     }
 }
